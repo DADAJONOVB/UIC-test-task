@@ -16,6 +16,7 @@ class StudentType(models.Model):
 class Student(models.Model):
     full_name = models.CharField(max_length=255)
     phone = models.CharField(max_length=255)
+    created = models.DateField(auto_now_add=True)
     university = models.ForeignKey(University, on_delete=models.CASCADE)
     type = models.ForeignKey(
         StudentType, 
@@ -46,7 +47,7 @@ class SponsorAplication(models.Model):
     full_name = models.CharField(max_length=255)
     phone = models.CharField(max_length=255)
     payment_price = models.IntegerField()
-    spent_price = models.IntegerField()
+    spent_price = models.IntegerField(blank=True, null=True)
     created = models.DateField(auto_now_add=True)
     type = models.SmallIntegerField(choices=TYPE, default=1)
     aplication_type = models.SmallIntegerField(choices=APPLICATION_TYPE, default=1)
@@ -64,7 +65,3 @@ class Sponsor(models.Model):
 
     def __str__(self):
         return str(self.sponsor.full_name)
-
-    # def save(self, *args, **kwargs):
-    #     self.sponsor.payment_price - self.price
-    #     self.sponsor.save(*args, **kwargs)
