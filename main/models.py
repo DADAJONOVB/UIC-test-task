@@ -7,11 +7,13 @@ class University(models.Model):
     def __str__(self):
         return self.name
 
+
 class StudentType(models.Model):
     name = models.CharField(max_length=255)
 
     def __str__(self):
         return self.name
+
 
 class Student(models.Model):
     full_name = models.CharField(max_length=255)
@@ -27,6 +29,7 @@ class Student(models.Model):
 
     def __str__(self):
         return self.full_name
+
 
 class SponsorAplication(models.Model):
     TYPE = (
@@ -47,7 +50,7 @@ class SponsorAplication(models.Model):
     full_name = models.CharField(max_length=255)
     phone = models.CharField(max_length=255)
     payment_price = models.IntegerField()
-    spent_price = models.IntegerField(blank=True, null=True)
+    spent_price = models.IntegerField(blank=True, null=True, default=0)
     created = models.DateField(auto_now_add=True)
     type = models.SmallIntegerField(choices=TYPE, default=1)
     aplication_type = models.SmallIntegerField(choices=APPLICATION_TYPE, default=1)

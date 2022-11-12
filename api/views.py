@@ -55,16 +55,17 @@ class StudentDetailView(generics.RetrieveUpdateDestroyAPIView):
         }
         return Response(data, status=status.HTTP_200_OK)
 
-label = ['Ya','fe']
-data1  = [13, 14]
-data2 = [15, 15]
+class AddSponsorToStudent(generics.CreateAPIView):
+    queryset = models.Sponsor.objects.all()
+    serializer_class = serializers.SponserSerializerCreate
+    permission_classes = (IsAdminUser, )
 
-@api_view(['POST'])
-@permission_classes([IsAdminUser])
-def add_sponsor_to_student(request):
+
+    def create(self, request):
+        print(request.data)
         try:
-            student_id = int(request.data.get('student_id'))
-            sponsor_id = int(request.data.get('sponsor_id'))
+            student_id = int(request.data.get('student'))
+            sponsor_id = int(request.data.get('sponsor'))
             price = int(request.data.get('price'))
             student = models.Student.objects.get(id=student_id)
             sponsor = models.SponsorAplication.objects.get(id=sponsor_id)
@@ -95,6 +96,7 @@ def add_sponsor_to_student(request):
                 'status':status.HTTP_400_BAD_REQUEST
             }
         return Response(data)
+
 
 
 @api_view(['GET'])
