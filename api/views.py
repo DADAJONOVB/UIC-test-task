@@ -10,16 +10,25 @@ from rest_framework.permissions import IsAdminUser
 
 
 class CreateSponsorAplicationView(generics.CreateAPIView):
+    """this class is used to write a sponsor application"""
+    
     queryset = models.SponsorAplication.objects.all()
     serializer_class = serializers.SponsorAplicationCreateSerializer
 
 
 class SponsorDetailAplicationView(generics.RetrieveUpdateDestroyAPIView):
+    """Through this class, 
+    you can get detailed information about the sponsor, 
+    change its information and completely delete it"""
+
     queryset = models.SponsorAplication.objects.all()
     serializer_class = serializers.SponsorAplicationCreateSerializer
     permission_classes = (IsAdminUser, )
 
 class SponsorAplicationListView(generics.ListAPIView):
+    """This class is used to output a list of patrons. 
+    With the paginator function, information is sent from 10 pages"""
+
     queryset = models.SponsorAplication.objects.all()
     serializer_class = serializers.SponsorAplicationCreateSerializer
     search_fields = ('full_name','organization',)
@@ -29,6 +38,12 @@ class SponsorAplicationListView(generics.ListAPIView):
 
 
 class StudentListView(generics.ListAPIView):
+    """This class is used to get the list of students, 
+    it is sent in 10 parts through the pagination function, 
+    there is a search system for the student according to the 
+    name of the university and the year of study, 
+    filtering is performed according to the university and student type"""
+
     queryset = models.Student.objects.all()
     serializer_class = serializers.StudentSerializer
     filter_backends = (SearchFilter,)
@@ -40,6 +55,9 @@ class StudentListView(generics.ListAPIView):
 
 
 class StudentDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """This class is used to get detailed information about Studnet, 
+    which you can delete and change."""
+
     queryset = models.Student.objects.all()
     serializer_class = serializers.StudentSerializer
     permission_classes = (IsAdminUser, )
@@ -56,13 +74,16 @@ class StudentDetailView(generics.RetrieveUpdateDestroyAPIView):
         return Response(data, status=status.HTTP_200_OK)
 
 class AddSponsorToStudent(generics.CreateAPIView):
+    """This is the class of adding a sponsor to a student. 
+    Through this class you can add a sponsor to one student, 
+    this class accepts the student, 
+    sponsor and how much money the sponsor wants to transfer."""
+
     queryset = models.Sponsor.objects.all()
     serializer_class = serializers.SponserSerializerCreate
     permission_classes = (IsAdminUser, )
 
-
     def create(self, request):
-        print(request.data)
         try:
             student_id = int(request.data.get('student'))
             sponsor_id = int(request.data.get('sponsor'))
@@ -102,19 +123,33 @@ class AddSponsorToStudent(generics.CreateAPIView):
 @api_view(['GET'])
 @permission_classes([IsAdminUser])
 def chart_data(request):
+    """this function returns data for the admin dashboard,"""
+
     label = ['YA', "FE", "MA", "AP", "MA", "IN", "IU", "AV", "SE", "OK", "NO", "DE"]
     sponsor = []
     student = []
+    total_pay_price = 0
+    total_requested_price = 0
+    price_to_be_payed = total_requested_price-total_pay_price
+
     for i in range(1, 13):
         query1 = models.SponsorAplication.objects.filter(created__month=i).count()
         query2 = models.Student.objects.filter(created__month=i).count()
         sponsor.append(query1)
         student.append(query2)
 
+    for s in models.Student.objects.all():
+        total_requested_price +=s.contract_price
+
+    for s in models.Sponsor.objects.all():
+        total_pay_price += s.price
+
     data = {
         "label":label,
         "sponsor":sponsor,
-        "student":student
+        "student":student,
+        "total_pay_price":total_pay_price,
+        "total_requested_price":total_requested_price,
+        "price_to_be_payed":price_to_be_payed
     }
-
     return Response(data)
