@@ -128,9 +128,6 @@ def chart_data(request):
     label = ['YA', "FE", "MA", "AP", "MA", "IN", "IU", "AV", "SE", "OK", "NO", "DE"]
     sponsor = []
     student = []
-    total_pay_price = 0
-    total_requested_price = 0
-    price_to_be_payed = total_requested_price-total_pay_price
 
     for i in range(1, 13):
         query1 = models.SponsorAplication.objects.filter(created__month=i).count()
@@ -138,12 +135,16 @@ def chart_data(request):
         sponsor.append(query1)
         student.append(query2)
 
+    total_requested_price = 0
     for s in models.Student.objects.all():
         total_requested_price +=s.contract_price
 
+    total_pay_price = 0
     for s in models.Sponsor.objects.all():
         total_pay_price += s.price
-
+    price_to_be_payed = total_requested_price-total_pay_price
+    if price_to_be_payed < 0:
+        price_to_be_payed = 0
     data = {
         "label":label,
         "sponsor":sponsor,
