@@ -171,5 +171,5 @@ class GetUserToken(APIView):
         return Response({
             'token': token.key,
             'user_id': user.pk,
-            'email': user.email
+            'username':user.username
         })
