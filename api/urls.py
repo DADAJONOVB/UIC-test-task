@@ -10,4 +10,5 @@ urlpatterns = [
     path('student/<int:pk>/', views.StudentDetailView.as_view()),
     path('chart/', views.chart_data),
     path('sponsor/add/', views.AddSponsorToStudent.as_view()),
+    path('get/user/', views.GetUserToken.as_view())
 ]

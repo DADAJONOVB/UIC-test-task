@@ -7,7 +7,9 @@ from rest_framework import status
 from rest_framework.filters import  SearchFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.permissions import IsAdminUser
-
+from rest_framework.views import APIView
+from rest_framework.authtoken.models import Token
+from django.contrib.auth.models import User
 
 class CreateSponsorAplicationView(generics.CreateAPIView):
     """this class is used to write a sponsor application"""
@@ -154,3 +156,20 @@ def chart_data(request):
         "price_to_be_payed":price_to_be_payed
     }
     return Response(data)
+
+
+class GetUserToken(APIView):
+    serializer_class = serializers.GetUseTokenSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data,
+                                           context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        username = serializer.data['username']
+        user = User.objects.get(username=username)
+        token, created = Token.objects.get_or_create(user=user)
+        return Response({
+            'token': token.key,
+            'user_id': user.pk,
+            'email': user.email
+        })
