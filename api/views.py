@@ -10,6 +10,8 @@ from rest_framework.permissions import IsAdminUser
 from rest_framework.views import APIView
 from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import User
+from django.contrib.auth import authenticate
+
 
 class CreateSponsorAplicationView(generics.CreateAPIView):
     """this class is used to write a sponsor application"""
@@ -166,10 +168,21 @@ class GetUserToken(APIView):
                                            context={'request': request})
         serializer.is_valid(raise_exception=True)
         username = serializer.data['username']
-        user = User.objects.get(username=username)
-        token, created = Token.objects.get_or_create(user=user)
-        return Response({
-            'token': token.key,
-            'user_id': user.pk,
-            'username':user.username
-        })
+        password = serializer.data['password']
+        user = authenticate(username=username, password=password)
+        if user is not None:
+
+            token, created = Token.objects.get_or_create(user=user)
+            data = {
+                'success':True,                
+                'token': token.key,
+                'user_id': user.pk,
+                'username':user.username
+            }
+        else:
+            data ={
+                'success':False,
+                'status': status.HTTP_404_NOT_FOUND
+            }
+        return Response(data)
+            
